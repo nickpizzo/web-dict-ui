@@ -36,10 +36,10 @@ $(document).ready(function () {
       newDefinition.removeClass("highlight");
     }, 1000);
 
-    $.ajax(API_ROOT + '/create', {
-      method: 'POST',
-      data: entry
-    }).done(function (data) {
+    $.ajax(API_ROOT + '/create', { //search
+      method: 'POST',  //GET
+      data: entry   // q:
+    }).done(function (data) {  //use .empty method
       newDefinition.addClass("highlight");
       setTimeout(function () {
         newDefinition.removeClass("highlight");
@@ -47,8 +47,14 @@ $(document).ready(function () {
     }).fail(handleAJAXError);
   })
 
-  $('.word-search-form').on('submit', function (event) {
-    console.log("Handle search here...");
+  $('.word-search-form').on('submit', function(event) {
+    event.preventDefault(); //stops form from being submitted (reloading on search click never triggers)
+    $.ajax(API_ROOT + '/search', {  //actual ajax request
+      data: $(this).serialize(),  //creates the following url http://word-dict.herokuapp.com/search?q=cat
+    }).done(function(data) {
+      $('.word-list').empty();  //runs jQuery empty fuction on word list that empties word list except for search results
+      handleWordList(data);  //see handleWordList function above
+    }).fail(handleAJAXError);
   });
 
   $.ajax(API_ROOT + '/words.json')
